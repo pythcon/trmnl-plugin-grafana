@@ -5,6 +5,7 @@ Supports two modes:
 2. POST body: Send configuration in JSON body (falls back to env vars for missing fields)
 """
 
+import json
 import logging
 import os
 from flask import Flask, jsonify, request
@@ -35,6 +36,14 @@ def get_config_from_request():
     else:
         body = {}
 
+    # Parse variables (can be dict or JSON string)
+    variables = body.get("variables", {})
+    if isinstance(variables, str):
+        try:
+            variables = json.loads(variables) if variables else {}
+        except json.JSONDecodeError:
+            variables = {}
+
     # Merge: POST body takes precedence over env vars
     config = {
         "grafana_url": (body.get("grafana_url") or os.environ.get("GRAFANA_URL", "")).rstrip("/"),
@@ -44,6 +53,7 @@ def get_config_from_request():
         "time_from": body.get("time_from") or os.environ.get("TIME_FROM", "now-1h"),
         "time_to": body.get("time_to") or os.environ.get("TIME_TO", "now"),
         "label": body.get("label") or os.environ.get("LABEL", "name"),
+        "variables": variables,
     }
 
     # Validate required fields
@@ -88,6 +98,8 @@ def get_data():
     # Get config from request body or env vars
     config, errors = get_config_from_request()
 
+    logger.info(f"Request: dashboard={config.get('dashboard_uid')}, panel={config.get('panel_id')}, time={config.get('time_from')} to {config.get('time_to')}")
+
     if errors:
         return jsonify({
             "error": "Missing or invalid configuration",
@@ -97,16 +109,31 @@ def get_data():
     try:
         with GrafanaClient(config["grafana_url"], config["api_key"]) as client:
             dashboard = client.get_dashboard(config["dashboard_uid"])
+            logger.info(f"Dashboard '{dashboard.title}' has {len(dashboard.panels)} panels")
+
             panel = dashboard.get_panel_by_id(config["panel_id"])
 
             if panel is None:
-                logger.error(f"Panel {config['panel_id']} not found")
+                available = [(p.id, p.type, p.title) for p in dashboard.panels]
+                logger.error(f"Panel {config['panel_id']} not found. Available: {available}")
                 return jsonify({
                     "panel_type": "error",
                     "error_message": f"Panel {config['panel_id']} not found in dashboard",
                 }), 404
 
-            result = client.query_panel(panel, config["time_from"], config["time_to"])
+            result = client.query_panel(
+                panel, config["time_from"], config["time_to"],
+                variables=config.get("variables", {})
+            )
+            logger.info(f"Query returned {len(result.frames)} frames for panel '{panel.title}' (type: {panel.type})")
+            for i, frame in enumerate(result.frames):
+                logger.debug(f"Frame {i}: name={frame.name}, {len(frame.fields)} fields, {len(frame.values) if frame.values else 0} value columns")
+
+            # Debug logging for timeseries panels to see field structure
+            if panel.type == "timeseries":
+                for i, frame in enumerate(result.frames):
+                    logger.info(f"Frame {i} fields: {frame.fields}")
+                    logger.info(f"Frame {i} values: {len(frame.values)} columns")
 
             if result.error:
                 logger.error(f"Query error: {result.error}")
@@ -117,8 +144,12 @@ def get_data():
                 }), 500
 
         transformer = get_transformer(panel.type)
+        logger.info(f"Using transformer: {transformer.__class__.__name__}")
         merge_variables = transformer.transform(panel, result, label_key=config["label"])
 
+        logger.info(f"Transform output keys: {list(merge_variables.keys())}")
+        if "stats" in merge_variables:
+            logger.info(f"Stats count: {len(merge_variables['stats'])}")
         logger.info(f"Returning data for {panel.type} panel: {panel.title}")
         return jsonify(merge_variables)
 

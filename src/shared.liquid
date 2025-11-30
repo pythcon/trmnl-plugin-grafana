@@ -1,5 +1,69 @@
-{% comment %}
-  Shared components placeholder.
-  Note: Liquid doesn't support inline template definitions.
-  All components are inlined directly in each layout file.
-{% endcomment %}
+{% comment %} Shared styles - prepended to all layouts {% endcomment %}
+
+<style>
+  /* Custom progress bar without inline styles */
+  .progress-bar { background: #e0e0e0; height: 24px; border-radius: 4px; overflow: hidden; position: relative; }
+  .progress-bar--small { height: 18px; }
+  .progress-fill { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); height: 100%; }
+  .progress-value { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; }
+  .pct--0 { width: 0%; } .pct--5 { width: 5%; } .pct--10 { width: 10%; } .pct--15 { width: 15%; } .pct--20 { width: 20%; }
+  .pct--25 { width: 25%; } .pct--30 { width: 30%; } .pct--35 { width: 35%; } .pct--40 { width: 40%; } .pct--45 { width: 45%; }
+  .pct--50 { width: 50%; } .pct--55 { width: 55%; } .pct--60 { width: 60%; } .pct--65 { width: 65%; } .pct--70 { width: 70%; }
+  .pct--75 { width: 75%; } .pct--80 { width: 80%; } .pct--85 { width: 85%; } .pct--90 { width: 90%; } .pct--95 { width: 95%; } .pct--100 { width: 100%; }
+  /* Base hexagon styles */
+  .hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .hexagon.status-ok { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); }
+  .hexagon.status-warning { background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%); }
+  .hexagon.status-critical { background: #1a1a1a; position: relative; }
+  .hexagon.status-critical::before { content: ''; position: absolute; top: 3px; right: 3px; bottom: 3px; left: 3px; background: #f5f5f5; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .hexagon.status-critical .hex-label { position: relative; z-index: 1; color: #1a1a1a; }
+  .hexagon.placeholder { visibility: hidden; }
+  .hex-label { line-height: 1.2; }
+
+  /* Full layout - dynamic sizing based on stat count */
+  .honeycomb { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; width: 100%; height: 100%; }
+  .hex-row { display: flex; justify-content: center; width: 100%; }
+  .hex-row:last-child { margin-bottom: 0; }
+
+  /* XL: <=10 stats, 5 per row */
+  .hex--full-xl .hexagon { width: 100px; height: 115px; }
+  .hex--full-xl .hex-label { font-size: 11px; }
+  .hex--full-xl .hex-row { margin-bottom: -29px; }
+  .hex--full-xl .hex-row:nth-child(even) { transform: translateX(50px); }
+
+  /* LG: 11-20 stats, 6 per row */
+  .hex--full-lg .hexagon { width: 75px; height: 86px; }
+  .hex--full-lg .hex-label { font-size: 10px; }
+  .hex--full-lg .hex-row { margin-bottom: -22px; }
+  .hex--full-lg .hex-row:nth-child(even) { transform: translateX(37px); }
+
+  /* MD: 21-35 stats, 7 per row */
+  .hex--full-md .hexagon { width: 60px; height: 69px; }
+  .hex--full-md .hex-label { font-size: 9px; }
+  .hex--full-md .hex-row { margin-bottom: -17px; }
+  .hex--full-md .hex-row:nth-child(even) { transform: translateX(30px); }
+
+  /* SM: >35 stats, 8 per row */
+  .hex--full-sm .hexagon { width: 50px; height: 58px; }
+  .hex--full-sm .hex-label { font-size: 8px; }
+  .hex--full-sm .hex-row { margin-bottom: -15px; }
+  .hex--full-sm .hex-row:nth-child(even) { transform: translateX(25px); }
+
+  /* Half-horizontal layout */
+  .hex--hh .hexagon { width: 80px; height: 92px; }
+  .hex--hh .hex-label { font-size: 10px; }
+
+  /* Half-vertical layout */
+  .hex--hv .hexagon { width: 90px; height: 104px; }
+  .hex--hv .hex-label { font-size: 10px; }
+  .hex--hv .hex-row { margin-bottom: -26px; }
+  .hex--hv .hex-row:nth-child(even) { transform: translateX(45px); }
+  .hex--hv .hex-row:last-child { margin-bottom: 0; }
+
+  /* Quadrant layout */
+  .hex--q .hexagon { width: 70px; height: 81px; }
+  .hex--q .hex-label { font-size: 9px; }
+  .hex--q .hex-row { margin-bottom: -20px; }
+  .hex--q .hex-row:nth-child(even) { transform: translateX(35px); }
+  .hex--q .hex-row:last-child { margin-bottom: 0; }
+</style>

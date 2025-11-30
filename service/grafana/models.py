@@ -43,12 +43,17 @@ class DataFrame:
         return None
 
     def get_time_values(self) -> list[Any]:
-        """Get time/timestamp values (first field named 'Time' or 'time')."""
+        """Get time/timestamp values (field with type='time' or common time names)."""
+        # First, look for field with type="time"
+        for i, f in enumerate(self.fields):
+            if f.get("type") == "time" and i < len(self.values):
+                return self.values[i]
+        # Fallback to name-based detection
         for name in ["Time", "time", "timestamp", "Timestamp"]:
             values = self.get_values_by_field_name(name)
             if values is not None:
                 return values
-        # Fallback to first field if it looks like timestamps
+        # Final fallback to first field if it looks like timestamps
         if self.values and self.values[0]:
             first_val = self.values[0][0] if self.values[0] else None
             if isinstance(first_val, (int, float)) and first_val > 1_000_000_000:
@@ -60,6 +65,9 @@ class DataFrame:
         time_names = {"Time", "time", "timestamp", "Timestamp"}
         result = []
         for i, f in enumerate(self.fields):
+            # Skip time fields by type or name
+            if f.get("type") == "time":
+                continue
             name = f.get("name", f"field_{i}")
             if name not in time_names and i < len(self.values):
                 result.append((name, self.values[i]))

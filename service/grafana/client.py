@@ -1,8 +1,11 @@
 """HTTP client for Grafana API."""
 
+import logging
 from typing import Any
 
 import httpx
+
+logger = logging.getLogger(__name__)
 
 from .exceptions import (
     GrafanaAPIError,
@@ -11,6 +14,35 @@ from .exceptions import (
     GrafanaNotFoundError,
 )
 from .models import Dashboard, Panel, QueryResult
+
+# Grafana built-in variables with sensible defaults
+# These are computed by Grafana's frontend and not available via API
+GRAFANA_BUILTINS = {
+    "__rate_interval": "5m",
+    "__interval": "1m",
+    "__interval_ms": "60000",
+    "__range": "1h",
+    "__range_s": "3600",
+    "__range_ms": "3600000",
+}
+
+
+def _substitute_variables(obj: Any, variables: dict[str, Any]) -> Any:
+    """Recursively substitute ${varname} and $varname patterns in strings."""
+    # Merge Grafana built-ins with user variables (user vars take precedence)
+    all_vars = {**GRAFANA_BUILTINS, **(variables or {})}
+    if not all_vars:
+        return obj
+    if isinstance(obj, str):
+        for name, value in all_vars.items():
+            obj = obj.replace(f"${{{name}}}", str(value))
+            obj = obj.replace(f"${name}", str(value))  # Also handle $varname
+        return obj
+    elif isinstance(obj, dict):
+        return {k: _substitute_variables(v, variables) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_substitute_variables(item, variables) for item in obj]
+    return obj
 
 
 class GrafanaClient:
@@ -148,6 +180,11 @@ class GrafanaClient:
         if not queries:
             return QueryResult()
 
+        # Log datasource info for debugging
+        for i, q in enumerate(queries):
+            ds = q.get("datasource", {})
+            logger.info(f"Query {i}: datasource={ds}, refId={q.get('refId')}")
+
         # Build query payload
         payload = {
             "from": time_from,
@@ -163,6 +200,7 @@ class GrafanaClient:
         panel: Panel,
         time_from: str = "now-1h",
         time_to: str = "now",
+        variables: dict[str, Any] | None = None,
     ) -> QueryResult:
         """
         Execute a panel's queries.
@@ -171,11 +209,30 @@ class GrafanaClient:
             panel: Panel object with targets
             time_from: Start of time range
             time_to: End of time range
+            variables: Dict of Grafana variables to substitute (e.g., {"datasource": "uid"})
 
         Returns:
             QueryResult with data frames
         """
-        return self.query_datasource(panel.targets, time_from, time_to)
+        variables = variables or {}
+        logger.info(f"Panel datasource: {panel.datasource}")
+        logger.info(f"Panel has {len(panel.targets)} targets")
+        if variables:
+            logger.info(f"Variables to substitute: {variables}")
+
+        queries = []
+        for target in panel.targets:
+            query = target.copy()
+            # If target doesn't have datasource, use panel's datasource
+            if "datasource" not in query or not query.get("datasource"):
+                if panel.datasource:
+                    query["datasource"] = panel.datasource
+            # Substitute variables in the entire query
+            query = _substitute_variables(query, variables)
+            logger.info(f"Query after substitution: {query}")
+            queries.append(query)
+
+        return self.query_datasource(queries, time_from, time_to)
 
     def close(self) -> None:
         """Close the HTTP client."""

@@ -115,6 +115,46 @@ python -m service.main
 2. The UID is in the URL: `grafana.example.com/d/DASHBOARD_UID/...`
 3. Click panel title → "Inspect" → "Panel JSON" to find the panel `id`
 
+## Advanced Configuration
+
+### Label Parameter
+
+For polystat and stat panels that use Prometheus data, the `label` field specifies which Prometheus label to use for display names.
+
+**Example**: If your Prometheus query returns:
+```
+{service_name="auth-service", instance="host:9090"} 1
+```
+
+Set `label` to `service_name` to display "auth-service" instead of the default metric name.
+
+**Common label keys**:
+- `name` (default) - Generic name label
+- `service_name` - Service identifier
+- `job` - Prometheus job name
+- `instance` - Target instance
+
+### Variables Parameter
+
+For dashboards using Grafana template variables (like `${datasource}`), provide a JSON object with variable substitutions.
+
+**Finding your datasource UID**:
+1. Go to Grafana → Connections → Data sources
+2. Click on your datasource
+3. The UID is in the URL: `grafana.example.com/connections/datasources/edit/DATASOURCE_UID`
+
+**Example**: If your panel uses `${datasource}` for the datasource:
+```json
+{"datasource": "your-datasource-uid"}
+```
+
+**Common patterns**:
+- `{"datasource": "prometheus-uid"}` - Substitute datasource variable
+- `{"instance": "server:9090"}` - Substitute instance variable
+- `{"datasource": "abc123", "job": "my-job"}` - Multiple variables
+
+**Note**: The plugin will substitute both `${varname}` and `$varname` patterns.
+
 ## Template Development
 
 Use `trmnlp serve` for local development with live preview:

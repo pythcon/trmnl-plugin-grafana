@@ -1,142 +1,116 @@
 {% comment %} Quadrant layout (400x240) {% endcomment %}
 
-<div class="view view--quadrant">
-  <div class="layout layout--col">
-    {% case panel_type %}
-      {% when 'stat' %}
-        <div class="flex flex--col flex--center flex--middle gap--space-1" style="height: 100%;">
-          {% if title and title != '' %}
-          <div class="label label--small">{{ title }}</div>
-          {% endif %}
-          <div class="value value--xl">{{ formatted_value | default: value }}</div>
-        </div>
+<div class="layout layout--col">
+  {% case panel_type %}
+    {% when 'stat' %}
+      <div class="flex flex--col flex--center flex--middle gap--space-1 h--full">
+        {% if title and title != '' %}
+        <div class="label label--small">{{ title }}</div>
+        {% endif %}
+        <div class="value value--xl">{{ formatted_value | default: value }}</div>
+      </div>
 
-      {% when 'timeseries', 'barchart', 'graph' %}
-        <div class="flex flex--col gap--space-1" style="height: 100%;">
-          <div id="chart-q" class="w--full" style="flex: 1; min-height: 140px;"></div>
-        </div>
-        <script src="https://usetrmnl.com/js/highcharts/12.3.0/highcharts.js"></script>
-        <script>
-          Highcharts.chart('chart-q', {
-            chart: { type: 'line', backgroundColor: 'transparent', height: 160, margin: [5, 5, 5, 25] },
+    {% when 'timeseries', 'barchart', 'graph' %}
+      {% assign chart_id = 'chart-q' | append_random %}
+      <div class="flex flex--col gap--space-1 h--full">
+        <div id="{{ chart_id }}" class="w--full flex--grow"></div>
+      </div>
+      <script src="https://usetrmnl.com/js/highcharts/12.3.0/highcharts.js"></script>
+      <script>
+        Highcharts.chart('{{ chart_id }}', {
+          chart: { type: 'line', backgroundColor: 'transparent', height: 160, margin: [5, 5, 5, 25] },
+          title: { text: null },
+          credits: { enabled: false },
+          legend: { enabled: false },
+          plotOptions: {
+            series: {
+              animation: false,
+              color: '#000000',
+              lineWidth: 1.5,
+              marker: { enabled: false }
+            }
+          },
+          xAxis: {
+            visible: false
+          },
+          yAxis: {
             title: { text: null },
-            credits: { enabled: false },
-            legend: { enabled: false },
-            plotOptions: {
-              series: {
-                animation: false,
-                color: '#000000',
-                lineWidth: 1.5,
-                marker: { enabled: false }
-              }
-            },
-            xAxis: {
-              visible: false
-            },
-            yAxis: {
-              title: { text: null },
-              labels: { style: { color: '#000000', fontSize: '9px' } },
-              gridLineColor: '#dddddd'
-            },
-            series: [{
-              data: [{% for point in chart_data %}{{ point.value }}{% unless forloop.last %},{% endunless %}{% endfor %}]
-            }]
-          });
-        </script>
+            gridLineColor: '#dddddd'
+          },
+          series: [{
+            data: [{% for point in chart_data %}{{ point.value }}{% unless forloop.last %},{% endunless %}{% endfor %}]
+          }]
+        });
+      </script>
 
-      {% when 'gauge' %}
-        {% assign pct = percentage | default: 0 %}
-        {% assign arc_length = 125.6 %}
-        {% assign filled = pct | times: arc_length | divided_by: 100 %}
-        <div class="flex flex--col flex--center flex--middle" style="height: 100%;">
-          <svg width="150" height="95" viewBox="0 0 150 95">
-            <path d="M 15 80 A 60 60 0 0 1 135 80" fill="none" stroke="#e0e0e0" stroke-width="12" stroke-linecap="round"/>
-            <path d="M 15 80 A 60 60 0 0 1 135 80" fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linecap="round"
-                  stroke-dasharray="{{ filled }} {{ arc_length }}" />
-            <text x="15" y="93" text-anchor="middle" font-size="9" fill="#666">{{ min | default: 0 }}</text>
-            <text x="135" y="93" text-anchor="middle" font-size="9" fill="#666">{{ max | default: 100 }}</text>
-            <text x="75" y="70" text-anchor="middle" font-size="24" font-weight="bold" fill="#1a1a1a">{{ formatted_value | default: value }}</text>
-          </svg>
+    {% when 'gauge' %}
+      {% assign pct = percentage | default: 0 %}
+      {% assign arc_length = 125.6 %}
+      {% assign filled = pct | times: arc_length | divided_by: 100 %}
+      <div class="flex flex--col flex--center flex--middle h--full">
+        <svg width="150" height="95" viewBox="0 0 150 95">
+          <path d="M 15 80 A 60 60 0 0 1 135 80" fill="none" stroke="#e0e0e0" stroke-width="12" stroke-linecap="round"/>
+          <path d="M 15 80 A 60 60 0 0 1 135 80" fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linecap="round"
+                stroke-dasharray="{{ filled }} {{ arc_length }}" />
+          <text x="15" y="93" text-anchor="middle" font-size="9" fill="#666">{{ min | default: 0 }}</text>
+          <text x="135" y="93" text-anchor="middle" font-size="9" fill="#666">{{ max | default: 100 }}</text>
+          <text x="75" y="70" text-anchor="middle" font-size="24" font-weight="bold" fill="#1a1a1a">{{ formatted_value | default: value }}</text>
+        </svg>
+      </div>
+
+    {% when 'bargauge' %}
+      <div class="flex flex--col gap--space-1 h--full">
+        {% if title and title != '' %}
+        <div class="label label--small">{{ title }}</div>
+        {% endif %}
+        {% for bar in bars limit: 2 %}
+        {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
+        {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
+        <div class="progress-bar progress-bar--small">
+          <div class="progress-fill pct--{{ pct_rounded }}"></div>
+          <span class="progress-value">{{ bar.formatted_value }}</span>
         </div>
+        {% endfor %}
+      </div>
 
-      {% when 'bargauge' %}
-        <div class="flex flex--col gap--space-1" style="height: 100%;">
-          {% if title and title != '' %}
-          <div class="label label--small">{{ title }}</div>
-          {% endif %}
-          {% for bar in bars limit: 2 %}
-          <div class="progress progress--small" style="--progress: {{ bar.percentage | default: 0 }}%;">
-            <span class="value">{{ bar.formatted_value }}</span>
+    {% when 'table' %}
+      <div class="flex flex--col gap--space-1 h--full overflow--hidden">
+        {% if title and title != '' %}
+        <div class="label label--small text--center">{{ title }}</div>
+        {% endif %}
+        <table class="table w--full">
+          <tbody>
+            {% for row in rows limit: 3 %}
+            <tr>
+              {% for cell in row limit: 2 %}<td class="p--1 text--left border--h-7">{{ cell }}</td>{% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% when 'polystat' %}
+      <div class="hex--q flex flex--wrap flex--center-x flex--content-start w--full h--full">
+        {% assign row_size = 2 %}
+        {% for stat in stats limit: 4 %}
+          {% assign mod = forloop.index0 | modulo: row_size %}
+          {% if mod == 0 %}<div class="hex-row flex flex--center-x w--full">{% endif %}
+          <div class="hexagon flex flex--col flex--center-x flex--center-y mx--0.5 status-{{ stat.status | default: 'ok' }}">
+            <span class="hex-label text--center text--white px--0.5">{{ stat.name }}</span>
           </div>
-          {% endfor %}
-        </div>
+          {% assign next_mod = forloop.index | modulo: row_size %}
+          {% if next_mod == 0 or forloop.last %}</div>{% endif %}
+        {% endfor %}
+      </div>
 
-      {% when 'table' %}
-        <style>
-          .data-table-q { width: 100%; border-collapse: collapse; font-size: 11px; }
-          .data-table-q td { padding: 4px 8px; text-align: left; border-bottom: 1px solid #ddd; }
-          .data-table-q tr:last-child td { border-bottom: none; }
-        </style>
-        <div class="flex flex--col gap--space-1" style="height: 100%; overflow: hidden;">
-          {% if title and title != '' %}
-          <div class="label label--small" style="text-align: center;">{{ title }}</div>
-          {% endif %}
-          <table class="data-table-q">
-            <tbody>
-              {% for row in rows limit: 3 %}
-              <tr>
-                {% for cell in row limit: 2 %}<td>{{ cell }}</td>{% endfor %}
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+    {% when 'error' %}
+      <div class="flex flex--col flex--center flex--middle h--full">
+        <div class="label label--small">Error</div>
+      </div>
 
-      {% when 'polystat' %}
-        <style>
-          .honeycomb-q { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; width: 100%; height: 100%; }
-          .hex-row-q { display: flex; justify-content: center; width: 100%; margin-bottom: -16px; }
-          .hex-row-q:nth-child(even) { transform: translateX(36px); }
-          .hex-row-q:last-child { margin-bottom: 0; }
-          .hexagon-q {
-            width: 70px; height: 81px;
-            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
-            margin: 0 2px;
-          }
-          .hexagon-q.status-ok { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); }
-          .hexagon-q.status-warning { background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%); }
-          .hexagon-q.status-critical { background: #1a1a1a; position: relative; }
-          .hexagon-q.status-critical::before {
-            content: ''; position: absolute; top: 2px; right: 2px; bottom: 2px; left: 2px;
-            background: #f5f5f5; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-          }
-          .hexagon-q.status-critical .hex-label-q { color: #1a1a1a; position: relative; z-index: 1; }
-          .hex-label-q { font-size: 9px; color: #ffffff; text-align: center; padding: 0 2px; line-height: 1.1; }
-        </style>
-        <div class="honeycomb-q">
-          {% assign row_size = 2 %}
-          {% for stat in stats limit: 4 %}
-            {% assign mod = forloop.index0 | modulo: row_size %}
-            {% if mod == 0 %}<div class="hex-row-q">{% endif %}
-            <div class="hexagon-q status-{{ stat.status | default: 'ok' }}">
-              <span class="hex-label-q">{{ stat.name }}</span>
-            </div>
-            {% assign next_mod = forloop.index | modulo: row_size %}
-            {% if next_mod == 0 or forloop.last %}</div>{% endif %}
-          {% endfor %}
-        </div>
-
-      {% when 'error' %}
-        <div class="flex flex--col flex--center flex--middle" style="height: 100%;">
-          <div class="label label--small">Error</div>
-        </div>
-
-      {% else %}
-        <div class="flex flex--col flex--center flex--middle gap--space-1" style="height: 100%;">
-          <div class="value value--xl">{{ formatted_value | default: value | default: '--' }}</div>
-        </div>
-    {% endcase %}
-  </div>
+    {% else %}
+      <div class="flex flex--col flex--center flex--middle gap--space-1 h--full">
+        <div class="value value--xl">{{ formatted_value | default: value | default: '--' }}</div>
+      </div>
+  {% endcase %}
 </div>
