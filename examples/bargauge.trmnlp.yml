@@ -1,0 +1,28 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: bargauge
+  title: Disk Usage by Volume
+  timestamp: "2025-11-30 12:00 UTC"
+
+  bars:
+    - name: "/dev/sda1 (root)"
+      value: 156
+      formatted_value: "156 GB"
+      percentage: 78
+    - name: "/dev/sdb1 (data)"
+      value: 892
+      formatted_value: "892 GB"
+      percentage: 45
+    - name: "/dev/sdc1 (logs)"
+      value: 45
+      formatted_value: "45 GB"
+      percentage: 90
+    - name: "/dev/sdd1 (backup)"
+      value: 1200
+      formatted_value: "1.2 TB"
+      percentage: 30

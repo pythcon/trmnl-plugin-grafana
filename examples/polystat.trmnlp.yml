@@ -1,0 +1,48 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: polystat
+  title: Service Health
+  timestamp: "2025-11-30 12:00 UTC"
+
+  stats:
+    - name: "API Gateway"
+      value: 99.9
+      formatted_value: "99.9%"
+      status: "ok"
+    - name: "Auth Service"
+      value: 100
+      formatted_value: "100%"
+      status: "ok"
+    - name: "Database"
+      value: 98.5
+      formatted_value: "98.5%"
+      status: "ok"
+    - name: "Cache"
+      value: 85.2
+      formatted_value: "85.2%"
+      status: "warning"
+    - name: "Queue"
+      value: 100
+      formatted_value: "100%"
+      status: "ok"
+    - name: "Storage"
+      value: 45.0
+      formatted_value: "45.0%"
+      status: "critical"
+    - name: "CDN"
+      value: 99.99
+      formatted_value: "99.99%"
+      status: "ok"
+    - name: "Search"
+      value: 92.3
+      formatted_value: "92.3%"
+      status: "warning"
+    - name: "Search"
+      value: 92.3
+      formatted_value: "92.3%"
+      status: "warning"

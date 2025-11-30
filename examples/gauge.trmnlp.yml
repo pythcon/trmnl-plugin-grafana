@@ -1,0 +1,16 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: gauge
+  title: Memory Usage
+  timestamp: "2025-11-30 12:00 UTC"
+
+  value: 68
+  formatted_value: "68%"
+  percentage: 68
+  min: 0
+  max: 100

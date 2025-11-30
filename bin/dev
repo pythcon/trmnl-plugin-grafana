@@ -1,0 +1,16 @@
+#!/bin/bash
+# Development script for trmnlp
+
+set -e
+
+# Load environment variables from .env if it exists
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Run trmnlp serve
+echo "Starting TRMNL Plugin development server..."
+echo "Open http://localhost:4567 in your browser"
+echo ""
+
+trmnlp serve

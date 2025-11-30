@@ -1,0 +1,163 @@
+{% comment %} Half vertical layout (400x480) {% endcomment %}
+
+<div class="view view--half-vertical">
+  <div class="layout layout--col gap--space-2">
+    {% case panel_type %}
+      {% when 'stat' %}
+        <div class="flex flex--col flex--center flex--middle gap--space-2" style="height: 100%;">
+          {% if title and title != '' %}
+          <div class="label">{{ title }}</div>
+          {% endif %}
+          <div class="value value--xxl">{{ formatted_value | default: value }}</div>
+        </div>
+
+      {% when 'timeseries', 'barchart', 'graph' %}
+        <div class="flex flex--col gap--space-1" style="height: 100%;">
+          <div id="chart-hv" class="w--full" style="flex: 1; min-height: 280px;"></div>
+        </div>
+        <script src="https://usetrmnl.com/js/highcharts/12.3.0/highcharts.js"></script>
+        <script>
+          Highcharts.chart('chart-hv', {
+            chart: { type: 'line', backgroundColor: 'transparent' },
+            title: { text: null },
+            credits: { enabled: false },
+            legend: { enabled: false },
+            plotOptions: {
+              series: {
+                animation: false,
+                color: '#000000',
+                lineWidth: 2,
+                marker: { enabled: false }
+              }
+            },
+            xAxis: {
+              categories: [{% for point in chart_data %}'{{ point.label }}'{% unless forloop.last %},{% endunless %}{% endfor %}],
+              labels: { enabled: false },
+              lineColor: '#000000'
+            },
+            yAxis: {
+              title: { text: null },
+              labels: { style: { color: '#000000', fontSize: '10px' } },
+              gridLineColor: '#cccccc'
+            },
+            series: [{
+              data: [{% for point in chart_data %}{{ point.value }}{% unless forloop.last %},{% endunless %}{% endfor %}]
+            }]
+          });
+        </script>
+
+      {% when 'gauge' %}
+        {% assign pct = percentage | default: 0 %}
+        {% assign arc_length = 251.2 %}
+        {% assign filled = pct | times: arc_length | divided_by: 100 %}
+        <div class="flex flex--col flex--center flex--middle" style="height: 100%;">
+          <svg width="280" height="170" viewBox="0 0 280 170">
+            <path d="M 20 140 A 120 120 0 0 1 260 140" fill="none" stroke="#e0e0e0" stroke-width="18" stroke-linecap="round"/>
+            <path d="M 20 140 A 120 120 0 0 1 260 140" fill="none" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"
+                  stroke-dasharray="{{ filled }} {{ arc_length }}" />
+            <text x="20" y="165" text-anchor="middle" font-size="12" fill="#666">{{ min | default: 0 }}</text>
+            <text x="260" y="165" text-anchor="middle" font-size="12" fill="#666">{{ max | default: 100 }}</text>
+            <text x="140" y="120" text-anchor="middle" font-size="42" font-weight="bold" fill="#1a1a1a">{{ formatted_value | default: value }}</text>
+            {% if title and title != '' %}
+            <text x="140" y="150" text-anchor="middle" font-size="14" fill="#666">{{ title }}</text>
+            {% endif %}
+          </svg>
+        </div>
+
+      {% when 'bargauge' %}
+        <div class="flex flex--col gap--space-2" style="height: 100%;">
+          {% if title and title != '' %}
+          <div class="label">{{ title }}</div>
+          {% endif %}
+          {% for bar in bars limit: 5 %}
+          <div class="flex flex--col gap--space-1">
+            <div class="label label--small">{{ bar.name }}</div>
+            <div class="progress" style="--progress: {{ bar.percentage | default: 0 }}%;">
+              <span class="value">{{ bar.formatted_value }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      {% when 'table' %}
+        <style>
+          .data-table-hv { width: 100%; border-collapse: collapse; font-size: 12px; }
+          .data-table-hv th, .data-table-hv td { padding: 6px 10px; text-align: left; border-bottom: 1px solid #ddd; }
+          .data-table-hv th { font-weight: bold; border-bottom: 2px solid #1a1a1a; }
+          .data-table-hv tr:last-child td { border-bottom: none; }
+        </style>
+        <div class="flex flex--col gap--space-1" style="height: 100%; overflow: hidden;">
+          {% if title and title != '' %}
+          <div class="label" style="text-align: center;">{{ title }}</div>
+          {% endif %}
+          <table class="data-table-hv">
+            <thead>
+              <tr>
+                {% for col in columns limit: 3 %}<th>{{ col }}</th>{% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows limit: 8 %}
+              <tr>
+                {% for cell in row limit: 3 %}<td>{{ cell }}</td>{% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      {% when 'polystat' %}
+        <style>
+          .honeycomb-hv { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; width: 100%; height: 100%; }
+          .hex-row-hv { display: flex; justify-content: center; width: 100%; margin-bottom: -22px; }
+          .hex-row-hv:nth-child(even) { transform: translateX(46px); }
+          .hex-row-hv:last-child { margin-bottom: 0; }
+          .hexagon-hv {
+            width: 90px; height: 104px;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+            margin: 0 2px;
+          }
+          .hexagon-hv.status-ok { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); }
+          .hexagon-hv.status-warning { background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%); }
+          .hexagon-hv.status-critical { background: #1a1a1a; position: relative; }
+          .hexagon-hv.status-critical::before {
+            content: ''; position: absolute; top: 3px; right: 3px; bottom: 3px; left: 3px;
+            background: #f5f5f5; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+          }
+          .hexagon-hv.status-critical .hex-label-hv { color: #1a1a1a; position: relative; z-index: 1; }
+          .hex-label-hv { font-size: 10px; color: #ffffff; text-align: center; padding: 0 4px; line-height: 1.2; }
+        </style>
+        <div class="honeycomb-hv">
+          {% assign row_size = 2 %}
+          {% for stat in stats limit: 6 %}
+            {% assign mod = forloop.index0 | modulo: row_size %}
+            {% if mod == 0 %}<div class="hex-row-hv">{% endif %}
+            <div class="hexagon-hv status-{{ stat.status | default: 'ok' }}">
+              <span class="hex-label-hv">{{ stat.name }}</span>
+            </div>
+            {% assign next_mod = forloop.index | modulo: row_size %}
+            {% if next_mod == 0 or forloop.last %}</div>{% endif %}
+          {% endfor %}
+        </div>
+
+      {% when 'error' %}
+        <div class="flex flex--col flex--center flex--middle" style="height: 100%;">
+          <div class="label">Error</div>
+          <div class="description">{{ error_message | default: 'Failed to load data' }}</div>
+        </div>
+
+      {% else %}
+        <div class="flex flex--col flex--center flex--middle gap--space-2" style="height: 100%;">
+          <div class="value value--xxl">{{ formatted_value | default: value | default: '--' }}</div>
+        </div>
+    {% endcase %}
+  </div>
+
+  <div class="title_bar title_bar--compact">
+    <img class="image" src="https://grafana.com/static/assets/img/fav32.png" />
+    <span class="title">{{ title | default: 'Grafana Panel' }}</span>
+    <span class="instance">{{ timestamp }}</span>
+  </div>
+</div>

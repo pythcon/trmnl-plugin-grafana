@@ -1,0 +1,12 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: error
+  title: Connection Error
+  timestamp: "2025-11-30 12:00 UTC"
+
+  error_message: "Unable to connect to Grafana API. Check your credentials."

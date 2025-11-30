@@ -1,0 +1,24 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: table
+  title: Server Status
+  timestamp: "2025-11-30 12:00 UTC"
+
+  columns:
+    - Host
+    - CPU
+    - Memory
+    - Status
+
+  rows:
+    - ["web-server-01", "42%", "60%", "OK"]
+    - ["web-server-02", "35%", "45%", "OK"]
+    - ["db-primary", "78%", "82%", "Warning"]
+    - ["db-replica", "25%", "40%", "OK"]
+    - ["cache-01", "15%", "90%", "Critical"]
+    - ["worker-01", "55%", "50%", "OK"]

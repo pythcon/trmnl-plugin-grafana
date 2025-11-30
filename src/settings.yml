@@ -1,0 +1,58 @@
+---
+strategy: polling
+no_screen_padding: 
+dark_mode: 
+static_data: 
+polling_verb: post
+polling_url: https://grafana.trmnlplugins.com/api/data
+polling_headers: 'Content-Type: application/json'
+polling_body: '{"grafana_url":"{{ grafana_url }}","api_key":"{{ api_key }}","dashboard_uid":"{{ dashboard_uid }}","panel_id":"{{ panel_id }}","time_from":"{{ time_from }}","time_to":"{{ time_to }}","label":"{{ label }}"}'
+id: 188971
+custom_fields:
+- keyname: grafana_url
+  name: Grafana URL
+  field_type: string
+  required: true
+  placeholder: https://grafana.example.com
+  description: Your Grafana instance URL
+- keyname: api_key
+  name: Grafana API Key
+  field_type: password
+  required: true
+  placeholder: glsa_xxxxxxxxxxxx
+  description: Service account token or API key
+- keyname: dashboard_uid
+  name: Dashboard UID
+  field_type: string
+  required: true
+  placeholder: abc123
+  description: UID of the dashboard (found in URL)
+- keyname: panel_id
+  name: Panel ID
+  field_type: string
+  required: true
+  placeholder: '1'
+  description: ID of the panel to display
+- keyname: time_from
+  name: Time Range From
+  field_type: string
+  required: false
+  placeholder: now-1h
+  default: now-1h
+  description: Start of time range (e.g., now-1h, now-24h)
+- keyname: time_to
+  name: Time Range To
+  field_type: string
+  required: false
+  placeholder: now
+  default: now
+  description: End of time range (usually "now")
+- keyname: label
+  name: Label Key
+  field_type: string
+  required: false
+  placeholder: name
+  default: name
+  description: Prometheus label key for display names (e.g., service_name, job)
+name: Grafana Panel
+refresh_interval: 60

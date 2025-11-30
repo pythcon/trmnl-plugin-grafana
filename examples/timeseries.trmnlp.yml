@@ -1,0 +1,26 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: timeseries
+  title: CPU Usage
+  timestamp: "2025-11-30 12:00 UTC"
+
+  chart_data:
+    - label: "11:00"
+      value: 25
+    - label: "11:10"
+      value: 32
+    - label: "11:20"
+      value: 45
+    - label: "11:30"
+      value: 38
+    - label: "11:40"
+      value: 52
+    - label: "11:50"
+      value: 48
+    - label: "12:00"
+      value: 42

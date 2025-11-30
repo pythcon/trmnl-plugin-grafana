@@ -1,0 +1,194 @@
+# TRMNL Grafana Plugin
+
+Display Grafana panels on TRMNL e-ink displays. This plugin is built as a TRMNL Recipe, compatible with the TRMNL marketplace and works with both TRMNL Core (cloud) and BYOS Laravel (self-hosted).
+
+## How It Works
+
+This plugin has two parts:
+
+1. **Liquid Templates** (`src/`) - Define how data is displayed on your TRMNL device
+2. **Data Service** (`service/`) - Fetches data from Grafana and makes it available to TRMNL
+
+TRMNL supports two strategies for getting data:
+
+| Strategy | How it works | Best for |
+|----------|--------------|----------|
+| **Polling** | TRMNL fetches from your API | Public endpoints, serverless |
+| **Webhook** | You push data to TRMNL | Behind firewalls, scheduled updates |
+
+## Quick Start
+
+### 1. Deploy Templates to TRMNL
+
+```bash
+# Install trmnlp CLI
+npm install -g trmnlp
+
+# Login and push templates
+trmnlp login
+trmnlp push
+```
+
+### 2. Configure Your Plugin in TRMNL
+
+After pushing, go to your TRMNL dashboard and configure the plugin:
+- Choose your **Data Strategy** (Polling or Webhook)
+- For **Polling**: Enter your API URL after setting up the Data Service
+- For **Webhook**: Copy the webhook URL to use with the Data Service
+
+### 3. Run the Data Service
+
+#### Option A: Polling Mode (Recommended)
+
+Host the Data Service as an API that TRMNL polls:
+
+```bash
+# Configure environment
+cp .env.example .env
+# Edit .env with your Grafana credentials
+
+# Run with Docker
+docker-compose up grafana-trmnl-api -d
+
+# Or run directly
+pip install -r requirements.txt
+python -m service.api
+```
+
+Then configure your TRMNL plugin's Polling URL to point to your API (e.g., `https://your-server.com/api/data`).
+
+#### Option B: Webhook Mode
+
+Run the Data Service to push data to TRMNL on a schedule:
+
+```bash
+# Configure environment
+cp .env.example .env
+# Edit .env with your Grafana credentials AND webhook URL
+
+# Run with Docker
+docker-compose up grafana-trmnl-webhook -d
+
+# Or run directly
+pip install -r requirements.txt
+python -m service.main
+```
+
+## Supported Panel Types
+
+| Panel Type | Status | Description |
+|------------|--------|-------------|
+| Stat | ✅ | Single value with optional sparkline |
+| Time Series | ✅ | Line charts with multiple series |
+| Graph | ✅ | Legacy graph panels |
+| Gauge | ✅ | Radial gauge with thresholds |
+| Bar Gauge | ✅ | Horizontal bar gauge |
+| Bar Chart | ✅ | Vertical bar charts |
+| Table | ✅ | Tabular data |
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `GRAFANA_URL` | Yes | - | Base URL of Grafana instance |
+| `GRAFANA_API_KEY` | Yes | - | Grafana API key or service account token |
+| `DASHBOARD_UID` | Yes | - | UID of the dashboard |
+| `PANEL_ID` | Yes | - | ID of the panel to display |
+| `TIME_FROM` | No | `now-1h` | Start of time range |
+| `TIME_TO` | No | `now` | End of time range |
+| `TRMNL_WEBHOOK_URL` | Webhook only | - | TRMNL webhook URL |
+| `INTERVAL` | Webhook only | `300` | Seconds between pushes |
+| `API_PORT` | API only | `8080` | Port for API server |
+
+### Getting Grafana API Key
+
+1. Go to Grafana → Administration → Service accounts
+2. Create a new service account
+3. Create a token with "Viewer" role
+4. Copy the token to `GRAFANA_API_KEY`
+
+### Finding Dashboard UID and Panel ID
+
+1. Open your Grafana dashboard
+2. The UID is in the URL: `grafana.example.com/d/DASHBOARD_UID/...`
+3. Click panel title → "Inspect" → "Panel JSON" to find the panel `id`
+
+## Template Development
+
+Use `trmnlp serve` for local development with live preview:
+
+```bash
+trmnlp serve
+# Open http://localhost:4567
+```
+
+Edit `.trmnlp.yml` to customize test data for previewing templates.
+
+### Template Structure
+
+```
+src/
+├── full.liquid           # Full screen (800x480)
+├── half_horizontal.liquid # Half horizontal (800x240)
+├── half_vertical.liquid  # Half vertical (400x480)
+├── quadrant.liquid       # Quarter screen (400x240)
+├── shared.liquid         # Reusable components
+└── settings.yml          # Plugin configuration
+```
+
+## Project Structure
+
+```
+trmnl-plugin-grafana/
+├── src/                    # Liquid templates
+├── service/                # Python data service
+│   ├── grafana/           # Grafana API client
+│   ├── transformers/      # Data transformers
+│   ├── api.py             # Flask API (Polling mode)
+│   ├── main.py            # Webhook mode entry point
+│   ├── config.py          # Configuration
+│   └── trmnl.py           # TRMNL webhook client
+├── .trmnlp.yml            # Local development config
+├── Dockerfile
+├── docker-compose.yml
+└── requirements.txt
+```
+
+## Docker Commands
+
+```bash
+# API mode (TRMNL polls your endpoint)
+docker-compose up grafana-trmnl-api -d
+
+# Webhook mode (push to TRMNL)
+docker-compose up grafana-trmnl-webhook -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+## Development
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run API mode locally
+python -m service.api
+
+# Run webhook mode once
+python -m service.main --once
+
+# Run tests
+pip install pytest pytest-cov respx
+pytest
+```
+
+## License
+
+MIT License

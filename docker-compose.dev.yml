@@ -1,0 +1,46 @@
+services:
+  # ============================================
+  # WEBHOOK MODE - Data Service pushes to TRMNL
+  # ============================================
+  # Use this if you're behind a firewall or prefer push-based updates.
+  # The service runs continuously, pushing data every INTERVAL seconds.
+  #
+  # Run with: docker-compose up grafana-trmnl-webhook
+  #
+  grafana-trmnl-webhook:
+    build: .
+    container_name: grafana-trmnl-webhook
+    restart: unless-stopped
+    environment:
+      - MODE=webhook
+      - GRAFANA_URL=${GRAFANA_URL}
+      - GRAFANA_API_KEY=${GRAFANA_API_KEY}
+      - DASHBOARD_UID=${DASHBOARD_UID}
+      - PANEL_ID=${PANEL_ID}
+      - TIME_FROM=${TIME_FROM:-now-1h}
+      - TIME_TO=${TIME_TO:-now}
+      - TRMNL_WEBHOOK_URL=${TRMNL_WEBHOOK_URL}
+      - INTERVAL=${INTERVAL:-300}
+
+  # ============================================
+  # API MODE - TRMNL polls this endpoint
+  # ============================================
+  # Use this if you have a public endpoint or want TRMNL to control refresh timing.
+  # Configure TRMNL's Polling URL to point to this service.
+  #
+  # Run with: docker-compose up grafana-trmnl-api
+  #
+  grafana-trmnl-api:
+    build: .
+    container_name: grafana-trmnl-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      - MODE=api
+      - GRAFANA_URL=${GRAFANA_URL}
+      - GRAFANA_API_KEY=${GRAFANA_API_KEY}
+      - DASHBOARD_UID=${DASHBOARD_UID}
+      - PANEL_ID=${PANEL_ID}
+      - TIME_FROM=${TIME_FROM:-now-1h}
+      - TIME_TO=${TIME_TO:-now}

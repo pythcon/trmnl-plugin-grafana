@@ -1,0 +1,14 @@
+watch:
+  - src
+  - .trmnlp.yml
+
+time_zone: America/New_York
+
+variables:
+  panel_type: stat
+  title: Active Users
+  timestamp: "2025-11-30 12:00 UTC"
+
+  value: 1247
+  formatted_value: "1,247"
+  description: "Currently online"
