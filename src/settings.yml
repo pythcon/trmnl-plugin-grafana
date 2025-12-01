@@ -6,7 +6,7 @@ static_data:
 polling_verb: post
 polling_url: https://grafana.trmnlplugins.com/api/data
 polling_headers: 'Content-Type: application/json'
-polling_body: '{"grafana_url":"{{ grafana_url }}","api_key":"{{ api_key }}","dashboard_uid":"{{ dashboard_uid }}","panel_id":"{{ panel_id }}","time_from":"{{ time_from }}","time_to":"{{ time_to }}","label":"{{ label }}","variables":{{ variables }}}'
+polling_body: '{"grafana_url":"{{ grafana_url }}","api_key":"{{ api_key }}","dashboard_uid":"{{ dashboard_uid }}","panel_id":"{{ panel_id }}","time_from":"{{ time_from }}","time_to":"{{ time_to }}","label":"{{ label }}","timezone":"{{ timezone }}","variables":{{ variables }}}'
 id: 189121
 custom_fields:
 - keyname: grafana_url
@@ -61,6 +61,13 @@ custom_fields:
   placeholder: '{"datasource":"prometheus-uid"}'
   default: "{}"
   description: JSON object of Grafana variables to substitute (e.g., {"datasource":"uid","instance":"server:9090"})
+- keyname: timezone
+  name: Timezone
+  field_type: string
+  required: false
+  placeholder: America/New_York
+  default: UTC
+  description: Timezone for timestamp display (e.g., America/New_York, Europe/London)
 - keyname: author_info
   name: About This Plugin
   field_type: author_bio

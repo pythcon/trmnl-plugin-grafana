@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from service.grafana.models import Panel, QueryResult
 
@@ -37,21 +38,30 @@ class BaseTransformer(ABC):
         """
         pass
 
-    def _base_variables(self, panel: Panel) -> dict[str, Any]:
+    def _base_variables(self, panel: Panel, tz_name: str = "UTC") -> dict[str, Any]:
         """
         Common variables for all panel types.
 
         Args:
             panel: Panel configuration
+            tz_name: Timezone name (e.g., "America/New_York", "UTC")
 
         Returns:
             Base merge_variables dict
         """
+        try:
+            tz = ZoneInfo(tz_name) if tz_name else ZoneInfo("UTC")
+        except Exception:
+            tz = ZoneInfo("UTC")
+
+        now = datetime.now(tz)
+        tz_abbrev = now.strftime("%Z") or tz_name
+
         return {
             "panel_type": self.panel_type,
             "title": panel.title,
             "description": panel.description,
-            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "timestamp": f"{now.strftime('%Y-%m-%d %H:%M')} {tz_abbrev}",
             "unit": panel.get_unit(),
         }
 

@@ -30,7 +30,7 @@ class PolystatTransformer(BaseTransformer):
         Produces:
             - stats: List of {name, value, status} for each hexagon
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
         variables["panel_type"] = "polystat"
 
         label_key = kwargs.get("label_key", "name")

@@ -31,6 +31,7 @@ class Config:
     # Optional settings
     interval: int  # Seconds between updates
     label: str  # Prometheus label key for display names
+    timezone: str  # Timezone for timestamp display (e.g., America/New_York)
 
 
 def load_config() -> Config:
@@ -103,4 +104,5 @@ def load_config() -> Config:
         trmnl_webhook_url=trmnl_webhook_url,
         interval=interval,
         label=environ.get("LABEL", "name"),
+        timezone=environ.get("TIMEZONE", "UTC"),
     )

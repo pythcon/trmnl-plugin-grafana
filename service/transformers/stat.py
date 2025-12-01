@@ -21,7 +21,7 @@ class StatTransformer(BaseTransformer):
             - color: Threshold-based color (green/yellow/red)
             - sparkline: Optional sparkline data points
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
 
         # Get the primary value
         value = query_result.get_single_value()

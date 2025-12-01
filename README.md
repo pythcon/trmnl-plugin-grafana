@@ -99,6 +99,7 @@ python -m service.main
 | `PANEL_ID` | Yes | - | ID of the panel to display |
 | `TIME_FROM` | No | `now-1h` | Start of time range |
 | `TIME_TO` | No | `now` | End of time range |
+| `TIMEZONE` | No | `UTC` | Timezone for timestamp display |
 | `TRMNL_WEBHOOK_URL` | Webhook only | - | TRMNL webhook URL |
 | `INTERVAL` | Webhook only | `300` | Seconds between pushes |
 | `API_PORT` | API only | `8080` | Port for API server |
@@ -155,6 +156,19 @@ For dashboards using Grafana template variables (like `${datasource}`), provide 
 - `{"datasource": "abc123", "job": "my-job"}` - Multiple variables
 
 **Note**: The plugin will substitute both `${varname}` and `$varname` patterns.
+
+### Timezone Parameter
+
+The `timezone` parameter controls how timestamps are displayed on your TRMNL device. Use standard Linux/IANA timezone names.
+
+**Examples**:
+- `America/New_York` - Eastern Time
+- `America/Los_Angeles` - Pacific Time
+- `Europe/London` - UK Time
+- `Asia/Tokyo` - Japan Standard Time
+- `UTC` (default) - Coordinated Universal Time
+
+**Finding your timezone**: Run `timedatectl list-timezones` on Linux or see the [IANA timezone list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
 ## Template Development
 

@@ -22,7 +22,7 @@ class GaugeTransformer(BaseTransformer):
             - color: Threshold-based color
             - min, max: Gauge range
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
 
         # Get the primary value
         value = query_result.get_single_value()
@@ -75,7 +75,7 @@ class BarGaugeTransformer(GaugeTransformer):
 
         Can have multiple values displayed as horizontal bars.
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
 
         # Get min/max from panel config
         min_val, max_val = panel.get_min_max()

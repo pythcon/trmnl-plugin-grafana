@@ -31,7 +31,7 @@ class TableTransformer(BaseTransformer):
             - rows: List of row data (list of cell values)
             - row_count: Total number of rows
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
 
         columns: list[str] = []
         rows: list[list[str]] = []

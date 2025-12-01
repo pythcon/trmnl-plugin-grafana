@@ -53,6 +53,7 @@ def get_config_from_request():
         "time_from": body.get("time_from") or os.environ.get("TIME_FROM", "now-1h"),
         "time_to": body.get("time_to") or os.environ.get("TIME_TO", "now"),
         "label": body.get("label") or os.environ.get("LABEL", "name"),
+        "timezone": body.get("timezone") or os.environ.get("TIMEZONE", "UTC"),
         "variables": variables,
     }
 
@@ -151,7 +152,7 @@ def get_data():
 
         transformer = get_transformer(panel.type)
         logger.info(f"Using transformer: {transformer.__class__.__name__}")
-        merge_variables = transformer.transform(panel, result, label_key=config["label"])
+        merge_variables = transformer.transform(panel, result, label_key=config["label"], timezone=config["timezone"])
 
         logger.info(f"Transform output keys: {list(merge_variables.keys())}")
         if "stats" in merge_variables:

@@ -23,7 +23,7 @@ class TimeSeriesTransformer(BaseTransformer):
             - formatted_value: Formatted current value
             - min_value, max_value, avg_value: Statistics
         """
-        variables = self._base_variables(panel)
+        variables = self._base_variables(panel, kwargs.get("timezone", "UTC"))
         label_key = kwargs.get("label", "name")
 
         series_list = []
