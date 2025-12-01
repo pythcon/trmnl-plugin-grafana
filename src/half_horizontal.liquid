@@ -100,14 +100,30 @@
       </div>
 
     {% when 'polystat' %}
-      <div class="hex--hh flex flex--center-x flex--center-y h--full">
-        <div class="flex flex--center-x">
-          {% for stat in stats limit: 6 %}
-          <div class="hexagon flex flex--col flex--center-x flex--center-y mx--0.5 status-{{ stat.status | default: 'ok' }}">
-            <span class="hex-label text--center text--white px--1">{{ stat.name }}</span>
+      {% assign stat_count = stats | size %}
+      {% if stat_count <= 6 %}
+        {% assign size_class = 'hex--hh-lg' %}{% assign row_size = 6 %}
+      {% elsif stat_count <= 14 %}
+        {% assign size_class = 'hex--hh-md' %}{% assign row_size = 7 %}
+      {% else %}
+        {% assign size_class = 'hex--hh-sm' %}{% assign row_size = 8 %}
+      {% endif %}
+      <div class="honeycomb {{ size_class }}">
+        {% for stat in stats %}
+          {% assign mod = forloop.index0 | modulo: row_size %}
+          {% if mod == 0 %}<div class="hex-row">{% endif %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-{{ stat.status | default: 'ok' }}">
+            <span class="hex-label text--center text--white">{{ stat.name }}</span>
           </div>
-          {% endfor %}
-        </div>
+          {% if forloop.last %}
+            {% assign remaining = row_size | minus: mod | minus: 1 %}
+            {% for i in (1..remaining) %}<div class="hexagon placeholder"></div>{% endfor %}
+          </div>
+          {% else %}
+            {% assign next_mod = forloop.index | modulo: row_size %}
+            {% if next_mod == 0 %}</div>{% endif %}
+          {% endif %}
+        {% endfor %}
       </div>
 
     {% when 'error' %}
