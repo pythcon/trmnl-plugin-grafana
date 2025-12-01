@@ -7,9 +7,9 @@ services:
   #
   # Run with: docker-compose up grafana-trmnl-webhook
   #
-  grafana-trmnl-webhook:
+  trmnl-plugin-grafana-webhook:
     image: ghcr.io/pythcon/trmnl-plugin-grafana:latest
-    container_name: grafana-trmnl-webhook
+    container_name: trmnl-plugin-grafana-webhook
     restart: unless-stopped
     environment:
       - MODE=webhook
@@ -19,6 +19,8 @@ services:
       - PANEL_ID=${PANEL_ID}
       - TIME_FROM=${TIME_FROM:-now-1h}
       - TIME_TO=${TIME_TO:-now}
+      - LABEL=${LABEL:-name}
+      - VARIABLES=${VARIABLES:-"{}"}
       - TRMNL_WEBHOOK_URL=${TRMNL_WEBHOOK_URL}
       - INTERVAL=${INTERVAL:-300}
 
@@ -30,9 +32,9 @@ services:
   #
   # Run with: docker-compose up grafana-trmnl-api
   #
-  grafana-trmnl-api:
+  trmnl-plugin-grafana-api:
     image: ghcr.io/pythcon/trmnl-plugin-grafana:latest
-    container_name: grafana-trmnl-api
+    container_name: trmnl-plugin-grafana-api
     restart: unless-stopped
     ports:
       - "${API_PORT:-8080}:8080"
@@ -44,3 +46,5 @@ services:
       - PANEL_ID=${PANEL_ID}
       - TIME_FROM=${TIME_FROM:-now-1h}
       - TIME_TO=${TIME_TO:-now}
+      - LABEL=${LABEL:-name}
+      - VARIABLES=${VARIABLES:-"{}"}

@@ -6,8 +6,8 @@ static_data:
 polling_verb: post
 polling_url: https://grafana.trmnlplugins.com/api/data
 polling_headers: 'Content-Type: application/json'
-polling_body: '{"grafana_url":"{{ grafana_url }}","api_key":"{{ api_key }}","dashboard_uid":"{{ dashboard_uid }}","panel_id":"{{ panel_id }}","time_from":"{{ time_from }}","time_to":"{{ time_to }}","label":"{{ label }}","variables":{{ variables | default: "{}" }}}'
-id: 189030
+polling_body: '{"grafana_url":"{{ grafana_url }}","api_key":"{{ api_key }}","dashboard_uid":"{{ dashboard_uid }}","panel_id":"{{ panel_id }}","time_from":"{{ time_from }}","time_to":"{{ time_to }}","label":"{{ label }}","variables":{{ variables }}}'
+id: 189121
 custom_fields:
 - keyname: grafana_url
   name: Grafana URL
