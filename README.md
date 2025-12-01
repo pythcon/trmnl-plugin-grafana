@@ -85,6 +85,7 @@ python -m service.main
 | Bar Gauge | ✅ | Horizontal bar gauge |
 | Bar Chart | ✅ | Vertical bar charts |
 | Table | ✅ | Tabular data |
+| Polystat | ✅ | Honeycomb status display with ok/warning/critical states |
 
 ## Configuration
 
