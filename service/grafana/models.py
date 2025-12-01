@@ -14,15 +14,25 @@ class DataFrame:
 
     @classmethod
     def from_api_response(cls, frame_data: dict[str, Any]) -> "DataFrame":
-        """Parse a data frame from Grafana API response."""
+        """Parse a data frame from Grafana API response.
+
+        Handles two formats:
+        - Nested: schema.fields, data.values (timeseries)
+        - Root: fields, values directly on frame (table)
+        """
         schema = frame_data.get("schema", {})
         data = frame_data.get("data", {})
 
-        return cls(
-            name=schema.get("name", ""),
-            fields=schema.get("fields", []),
-            values=data.get("values", []),
-        )
+        # Get fields - try schema first, then root level
+        fields = schema.get("fields") or frame_data.get("fields", [])
+
+        # Get values - try data first, then root level
+        values = data.get("values") or frame_data.get("values", [])
+
+        # Get name - try schema first, then root level
+        name = schema.get("name") or frame_data.get("name", "")
+
+        return cls(name=name, fields=fields, values=values)
 
     def get_field_names(self) -> list[str]:
         """Get list of field names."""
@@ -117,6 +127,7 @@ class QueryResult:
         error: str | None = None
 
         results = response.get("results", {})
+
         for ref_id, result in results.items():
             if "error" in result:
                 error = result["error"]
@@ -157,6 +168,7 @@ class Panel:
     field_config: dict[str, Any] = field(default_factory=dict)
     datasource: dict[str, Any] | None = None
     description: str = ""
+    transformations: list[dict[str, Any]] = field(default_factory=list)
 
     @classmethod
     def from_api_response(cls, panel_data: dict[str, Any]) -> "Panel":
@@ -170,6 +182,7 @@ class Panel:
             field_config=panel_data.get("fieldConfig", {}),
             datasource=panel_data.get("datasource"),
             description=panel_data.get("description", ""),
+            transformations=panel_data.get("transformations", []),
         )
 
     @property
@@ -204,6 +217,26 @@ class Panel:
         """Get min/max values from field config."""
         defaults = self.field_config.get("defaults", {})
         return defaults.get("min"), defaults.get("max")
+
+    def get_excluded_fields(self) -> set[str]:
+        """Get field names that should be hidden based on 'organize' transformation."""
+        excluded: set[str] = set()
+        for t in self.transformations:
+            if t.get("id") == "organize":
+                options = t.get("options", {})
+                for name, is_excluded in options.get("excludeByName", {}).items():
+                    if is_excluded:
+                        excluded.add(name)
+        return excluded
+
+    def get_field_renames(self) -> dict[str, str]:
+        """Get field rename mappings from 'organize' transformation."""
+        renames: dict[str, str] = {}
+        for t in self.transformations:
+            if t.get("id") == "organize":
+                options = t.get("options", {})
+                renames.update(options.get("renameByName", {}))
+        return renames
 
 
 @dataclass

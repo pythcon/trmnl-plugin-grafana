@@ -135,6 +135,12 @@ def get_data():
                     logger.info(f"Frame {i} fields: {frame.fields}")
                     logger.info(f"Frame {i} values: {len(frame.values)} columns")
 
+            # Debug logging for table panels
+            if panel.type == "table":
+                for i, frame in enumerate(result.frames):
+                    logger.info(f"Table frame {i}: fields={frame.fields}")
+                    logger.info(f"Table frame {i}: values count={len(frame.values) if frame.values else 0}")
+
             if result.error:
                 logger.error(f"Query error: {result.error}")
                 return jsonify({

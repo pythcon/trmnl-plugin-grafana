@@ -21,6 +21,7 @@ class TestConfig:
             time_to="now",
             trmnl_webhook_url="https://webhook.trmnl.com/xxx",
             interval=300,
+            label="name",
         )
 
         assert config.grafana_url == "https://grafana.example.com"
@@ -31,6 +32,7 @@ class TestConfig:
         assert config.time_to == "now"
         assert config.trmnl_webhook_url == "https://webhook.trmnl.com/xxx"
         assert config.interval == 300
+        assert config.label == "name"
 
 
 class TestLoadConfig:

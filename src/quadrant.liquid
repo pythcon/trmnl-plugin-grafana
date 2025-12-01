@@ -74,15 +74,12 @@
       </div>
 
     {% when 'table' %}
-      <div class="flex flex--col gap--space-1 h--full overflow--hidden">
-        {% if title and title != '' %}
-        <div class="label label--small text--center">{{ title }}</div>
-        {% endif %}
-        <table class="table w--full">
+      <div class="flex flex--col h--full overflow--hidden">
+        <table class="table table--compact w--full">
           <tbody>
-            {% for row in rows limit: 3 %}
+            {% for row in rows limit: 5 %}
             <tr>
-              {% for cell in row limit: 2 %}<td class="p--1 text--left border--h-7">{{ cell }}</td>{% endfor %}
+              {% for cell in row limit: 2 %}<td class="px--1 py--0 text--left border--h-7">{{ cell }}</td>{% endfor %}
             </tr>
             {% endfor %}
           </tbody>

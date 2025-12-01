@@ -43,6 +43,30 @@ class TestDataFrame:
         assert frame.fields == []
         assert frame.values == []
 
+    def test_from_api_response_root_format(self):
+        """Test parsing DataFrame from API response with root-level fields/values (table format)."""
+        frame_data = {
+            "name": "table_frame",
+            "fields": [
+                {"name": "Host", "type": "string"},
+                {"name": "CPU", "type": "number"},
+            ],
+            "values": [
+                ["server-1", "server-2"],
+                [42, 35],
+            ],
+        }
+
+        frame = DataFrame.from_api_response(frame_data)
+
+        assert frame.name == "table_frame"
+        assert len(frame.fields) == 2
+        assert frame.fields[0]["name"] == "Host"
+        assert frame.fields[1]["name"] == "CPU"
+        assert len(frame.values) == 2
+        assert frame.values[0] == ["server-1", "server-2"]
+        assert frame.values[1] == [42, 35]
+
     def test_get_field_names(self, sample_dataframe: DataFrame):
         """Test getting field names."""
         names = sample_dataframe.get_field_names()
