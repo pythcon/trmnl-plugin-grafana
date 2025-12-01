@@ -72,21 +72,75 @@
       </div>
 
     {% when 'bargauge' %}
-      <div class="flex flex--col gap--space-4 h--full">
-        {% if title and title != '' %}
-        <div class="label label--large">{{ title }}</div>
-        {% endif %}
-        {% for bar in bars %}
-        <div class="flex flex--col gap--space-1">
-          <div class="label">{{ bar.name }}</div>
-          {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
-          {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-          <div class="progress-bar">
-            <div class="progress-fill pct--{{ pct_rounded }}"></div>
-            <span class="progress-value">{{ bar.formatted_value }}</span>
+      {% assign bar_count = bars | size %}
+      {% if bar_count <= 4 %}
+        {% assign bar_size = 'progress-bar--xl' %}
+        {% assign label_size = 'label--large' %}
+        {% assign gap_size = 'gap--space-4' %}
+        {% assign use_columns = false %}
+      {% elsif bar_count <= 7 %}
+        {% assign bar_size = 'progress-bar--large' %}
+        {% assign label_size = '' %}
+        {% assign gap_size = 'gap--space-3' %}
+        {% assign use_columns = false %}
+      {% else %}
+        {% assign bar_size = 'progress-bar--medium' %}
+        {% assign label_size = 'label--small' %}
+        {% assign gap_size = 'gap--space-2' %}
+        {% assign use_columns = true %}
+        {% assign half = bar_count | divided_by: 2 %}
+      {% endif %}
+      <div class="flex flex--col flex--center flex--middle h--full w--full px--4">
+        {% if use_columns %}
+        <div class="flex gap--space-4 w--full">
+          <div class="flex flex--col {{ gap_size }} w--full">
+            {% for bar in bars limit: half %}
+            <div class="flex flex--col gap--space-1 w--full">
+              <div class="flex justify--between">
+                <span class="label {{ label_size }}">{{ bar.name }}</span>
+                <span class="label {{ label_size }}">{{ bar.formatted_value }}</span>
+              </div>
+              {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
+              {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
+              <div class="progress-bar {{ bar_size }} w--full">
+                <div class="progress-fill pct--{{ pct_rounded }}"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="flex flex--col {{ gap_size }} w--full">
+            {% for bar in bars offset: half %}
+            <div class="flex flex--col gap--space-1 w--full">
+              <div class="flex justify--between">
+                <span class="label {{ label_size }}">{{ bar.name }}</span>
+                <span class="label {{ label_size }}">{{ bar.formatted_value }}</span>
+              </div>
+              {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
+              {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
+              <div class="progress-bar {{ bar_size }} w--full">
+                <div class="progress-fill pct--{{ pct_rounded }}"></div>
+              </div>
+            </div>
+            {% endfor %}
           </div>
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="flex flex--col {{ gap_size }} w--full">
+          {% for bar in bars %}
+          <div class="flex flex--col gap--space-1 w--full">
+            <div class="flex justify--between">
+              <span class="label {{ label_size }}">{{ bar.name }}</span>
+              <span class="label {{ label_size }}">{{ bar.formatted_value }}</span>
+            </div>
+            {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
+            {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
+            <div class="progress-bar {{ bar_size }} w--full">
+              <div class="progress-fill pct--{{ pct_rounded }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
 
     {% when 'table' %}

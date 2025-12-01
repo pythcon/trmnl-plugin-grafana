@@ -6,23 +6,19 @@ time_zone: America/New_York
 
 variables:
   panel_type: bargauge
-  title: Disk Usage by Volume
-  timestamp: "2025-11-30 12:00 UTC"
+  title: System Pressure
+  timestamp: "2025-12-01 12:00 UTC"
 
   bars:
-    - name: "/dev/sda1 (root)"
-      value: 156
-      formatted_value: "156 GB"
-      percentage: 78
-    - name: "/dev/sdb1 (data)"
-      value: 892
-      formatted_value: "892 GB"
+    - name: "cpu"
+      value: 45.2
+      formatted_value: "45.2%"
       percentage: 45
-    - name: "/dev/sdc1 (logs)"
-      value: 45
-      formatted_value: "45 GB"
-      percentage: 90
-    - name: "/dev/sdd1 (backup)"
-      value: 1200
-      formatted_value: "1.2 TB"
-      percentage: 30
+    - name: "memory"
+      value: 72.8
+      formatted_value: "72.8%"
+      percentage: 73
+    - name: "io"
+      value: 12.5
+      formatted_value: "12.5%"
+      percentage: 13

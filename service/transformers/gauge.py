@@ -84,6 +84,7 @@ class BarGaugeTransformer(GaugeTransformer):
 
         unit = panel.get_unit()
         decimals = panel.get_decimals()
+        label_key = kwargs.get("label", "name")
 
         # Process all frames/values for multi-bar display
         bars = []
@@ -96,8 +97,12 @@ class BarGaugeTransformer(GaugeTransformer):
                     percentage = self._calculate_percentage(
                         value, variables["min"], variables["max"]
                     )
+                    # Use display name from Prometheus labels instead of raw field name
+                    display_name = frame.get_display_name(label_key)
+                    if display_name == "Unknown":
+                        display_name = field_name
                     bars.append({
-                        "name": field_name,
+                        "name": display_name,
                         "value": value,
                         "formatted_value": self._format_value(value, unit, decimals),
                         "percentage": percentage,

@@ -5,64 +5,28 @@ watch:
 time_zone: America/New_York
 
 variables:
-  panel_type: polystat
-  title: Service Health
-  timestamp: "2025-11-30 12:00 UTC"
+  panel_type: bargauge
+  title: System Pressure
+  timestamp: "2025-12-01 12:00 UTC"
 
-  stats:
-    - name: "API Gateway"
-      status: "ok"
-    - name: "Auth Service"
-      status: "ok"
-    - name: "Database"
-      status: "ok"
-    - name: "Cache"
-      status: "warning"
-    - name: "Queue"
-      status: "ok"
-    - name: "Storage"
-      status: "critical"
-    - name: "CDN"
-      status: "ok"
-    - name: "Search"
-      status: "warning"
-    - name: "Email"
-      status: "ok"
-    - name: "SMS"
-      status: "ok"
-    - name: "Push"
-      status: "ok"
-    - name: "Analytics"
-      status: "warning"
-    - name: "Billing"
-      status: "ok"
-    - name: "Reports"
-      status: "ok"
-    - name: "Scheduler"
-      status: "ok"
-    - name: "Worker"
-      status: "ok"
-    - name: "Redis"
-      status: "ok"
-    - name: "Postgres"
-      status: "ok"
-    - name: "MongoDB"
-      status: "warning"
-    - name: "Elastic"
-      status: "ok"
-    - name: "Kafka"
-      status: "ok"
-    - name: "RabbitMQ"
-      status: "ok"
-    - name: "Nginx"
-      status: "ok"
-    - name: "HAProxy"
-      status: "ok"
-    - name: "Vault"
-      status: "ok"
-    - name: "Consul"
-      status: "ok"
-    - name: "Prometheus"
-      status: "ok"
-    - name: "Grafana"
-      status: "ok"
+  bars:
+    - name: "cpu"
+      value: 45.2
+      formatted_value: "45.2%"
+      percentage: 45
+    - name: "memory"
+      value: 72.8
+      formatted_value: "72.8%"
+      percentage: 73
+    - name: "io"
+      value: 12.5
+      formatted_value: "12.5%"
+      percentage: 13
+    - name: "cpu"
+      value: 45.2
+      formatted_value: "45.2%"
+      percentage: 45
+    - name: "memory"
+      value: 72.8
+      formatted_value: "72.8%"
+      percentage: 73

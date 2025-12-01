@@ -66,6 +66,6 @@ custom_fields:
   field_type: author_bio
   description: Display Grafana panels on your TRMNL e-ink display
   github_url: https://github.com/pythcon
-  website_url: https://trmnlplugins.com
+  learn_more_url: https://trmnlplugins.com
 name: Grafana Panel
 refresh_interval: 60
