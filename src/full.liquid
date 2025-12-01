@@ -5,6 +5,9 @@
     {% when 'stat' %}
       <div class="flex flex--col flex--center flex--middle h--full">
         <div class="value value--xxxl">{{ formatted_value | default: value }}</div>
+        {% if description and description != '' %}
+        <div class="description">{{ description }}</div>
+        {% endif %}
       </div>
 
     {% when 'timeseries', 'barchart', 'graph' %}
