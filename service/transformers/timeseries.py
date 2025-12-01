@@ -24,17 +24,26 @@ class TimeSeriesTransformer(BaseTransformer):
             - min_value, max_value, avg_value: Statistics
         """
         variables = self._base_variables(panel)
+        label_key = kwargs.get("label", "name")
 
         series_list = []
         all_chart_data = []
 
         for frame in query_result.frames:
             time_values = frame.get_time_values()
-            value_fields = frame.get_value_fields()
 
-            for field_name, values in value_fields:
+            # Iterate over fields to get both field dict and values
+            time_names = {"Time", "time", "timestamp", "Timestamp"}
+            for i, field in enumerate(frame.fields):
+                if field.get("type") == "time":
+                    continue
+                field_name = field.get("name", f"field_{i}")
+                if field_name in time_names or i >= len(frame.values):
+                    continue
+
+                values = frame.values[i]
                 series_data = self._process_series(
-                    field_name, time_values, values, panel
+                    field, time_values, values, panel, label_key
                 )
                 series_list.append(series_data["metadata"])
                 all_chart_data.extend(series_data["points"])
@@ -55,14 +64,19 @@ class TimeSeriesTransformer(BaseTransformer):
 
     def _process_series(
         self,
-        name: str,
+        field: dict[str, Any],
         time_values: list[Any],
         values: list[Any],
         panel: Panel,
+        label_key: str = "name",
     ) -> dict[str, Any]:
         """Process a single series of time series data."""
         unit = panel.get_unit()
         decimals = panel.get_decimals()
+
+        # Get display name from field labels or fall back to field name
+        labels = field.get("labels", {})
+        name = labels.get(label_key) or field.get("name", "Value")
 
         # Filter out None values for statistics
         numeric_values = [v for v in values if isinstance(v, (int, float))]

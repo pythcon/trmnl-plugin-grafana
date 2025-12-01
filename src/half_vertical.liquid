@@ -47,7 +47,7 @@
 
     {% when 'gauge' %}
       {% assign pct = percentage | default: 0 %}
-      {% assign arc_length = 251.2 %}
+      {% assign arc_length = 377 %}
       {% assign filled = pct | times: arc_length | divided_by: 100 %}
       <div class="flex flex--col flex--center flex--middle h--full">
         <svg width="280" height="170" viewBox="0 0 280 170">
