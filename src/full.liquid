@@ -3,14 +3,8 @@
 <div class="layout layout--col gap--space-4">
   {% case panel_type %}
     {% when 'stat' %}
-      <div class="flex flex--col flex--center flex--middle gap--space-4 h--full">
-        {% if title and title != '' %}
-        <div class="label label--large">{{ title }}</div>
-        {% endif %}
+      <div class="flex flex--col flex--center flex--middle h--full">
         <div class="value value--xxxl">{{ formatted_value | default: value }}</div>
-        {% if description and description != '' %}
-        <div class="description">{{ description }}</div>
-        {% endif %}
       </div>
 
     {% when 'timeseries', 'barchart', 'graph' %}

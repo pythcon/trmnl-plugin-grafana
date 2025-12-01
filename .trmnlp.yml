@@ -5,28 +5,10 @@ watch:
 time_zone: America/New_York
 
 variables:
-  panel_type: bargauge
-  title: System Pressure
-  timestamp: "2025-12-01 12:00 UTC"
+  panel_type: stat
+  title: Active Users
+  timestamp: "2025-11-30 12:00 UTC"
 
-  bars:
-    - name: "cpu"
-      value: 45.2
-      formatted_value: "45.2%"
-      percentage: 45
-    - name: "memory"
-      value: 72.8
-      formatted_value: "72.8%"
-      percentage: 73
-    - name: "io"
-      value: 12.5
-      formatted_value: "12.5%"
-      percentage: 13
-    - name: "cpu"
-      value: 45.2
-      formatted_value: "45.2%"
-      percentage: 45
-    - name: "memory"
-      value: 72.8
-      formatted_value: "72.8%"
-      percentage: 73
+  value: 1247
+  formatted_value: "1,247"
+  description: "Currently online"

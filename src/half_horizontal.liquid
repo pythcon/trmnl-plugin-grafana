@@ -3,10 +3,7 @@
 <div class="layout layout--col gap--space-2">
   {% case panel_type %}
     {% when 'stat' %}
-      <div class="flex flex--col flex--center flex--middle gap--space-2 h--full">
-        {% if title and title != '' %}
-        <div class="label">{{ title }}</div>
-        {% endif %}
+      <div class="flex flex--col flex--center flex--middle h--full">
         <div class="value value--xxl">{{ formatted_value | default: value }}</div>
       </div>
 
