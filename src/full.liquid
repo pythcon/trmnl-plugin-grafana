@@ -36,7 +36,8 @@
             },
             yAxis: {
               title: { text: null },
-              gridLineColor: '#cccccc'
+              gridLineColor: '#000000',
+              gridLineWidth: 0.5
             },
             series: [{
               data: [{% for point in chart_data %}{{ point.value }}{% unless forloop.last %},{% endunless %}{% endfor %}]
@@ -51,19 +52,19 @@
       <div class="flex flex--col flex--center flex--middle h--full">
           <svg width="300" height="180" viewBox="0 0 300 180">
             <!-- Background arc -->
-            <path d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="#e0e0e0" stroke-width="20" stroke-linecap="round"/>
+            <path d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round"/>
             <!-- Filled arc -->
-            <path d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="#1a1a1a" stroke-width="20" stroke-linecap="round"
+            <path d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="#000000" stroke-width="20" stroke-linecap="round"
                   stroke-dasharray="{{ filled }} {{ arc_length }}" />
             <!-- Min label -->
-            <text x="30" y="175" text-anchor="middle" font-size="14" fill="#666">{{ min | default: 0 }}</text>
+            <text x="30" y="175" text-anchor="middle" font-size="14" fill="#000000">{{ min | default: 0 }}</text>
             <!-- Max label -->
-            <text x="270" y="175" text-anchor="middle" font-size="14" fill="#666">{{ max | default: 100 }}</text>
+            <text x="270" y="175" text-anchor="middle" font-size="14" fill="#000000">{{ max | default: 100 }}</text>
             <!-- Value -->
-            <text x="150" y="130" text-anchor="middle" font-size="48" font-weight="bold" fill="#1a1a1a">{{ formatted_value | default: value }}</text>
+            <text x="150" y="130" text-anchor="middle" font-size="48" font-weight="bold" fill="#000000">{{ formatted_value | default: value }}</text>
             <!-- Title -->
             {% if title and title != '' %}
-            <text x="150" y="160" text-anchor="middle" font-size="16" fill="#666">{{ title }}</text>
+            <text x="150" y="160" text-anchor="middle" font-size="16" fill="#000000">{{ title }}</text>
           {% endif %}
         </svg>
       </div>
@@ -99,8 +100,8 @@
               </div>
               {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
               {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-              <div class="progress-bar {{ bar_size }} w--full">
-                <div class="progress-fill pct--{{ pct_rounded }}"></div>
+              <div class="progress-bar {{ bar_size }} w--full bg--gray-15 border--h-1">
+                <div class="progress-fill bg--black pct--{{ pct_rounded }}"></div>
               </div>
             </div>
             {% endfor %}
@@ -114,8 +115,8 @@
               </div>
               {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
               {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-              <div class="progress-bar {{ bar_size }} w--full">
-                <div class="progress-fill pct--{{ pct_rounded }}"></div>
+              <div class="progress-bar {{ bar_size }} w--full bg--gray-15 border--h-1">
+                <div class="progress-fill bg--black pct--{{ pct_rounded }}"></div>
               </div>
             </div>
             {% endfor %}
@@ -131,8 +132,8 @@
             </div>
             {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
             {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-            <div class="progress-bar {{ bar_size }} w--full">
-              <div class="progress-fill pct--{{ pct_rounded }}"></div>
+            <div class="progress-bar {{ bar_size }} w--full bg--gray-15 border--h-1">
+              <div class="progress-fill bg--black pct--{{ pct_rounded }}"></div>
             </div>
           </div>
           {% endfor %}
@@ -173,9 +174,20 @@
         {% for stat in stats %}
           {% assign mod = forloop.index0 | modulo: row_size %}
           {% if mod == 0 %}<div class="hex-row">{% endif %}
-          <div class="hexagon flex flex--col flex--center flex--middle status-{{ stat.status | default: 'ok' }}">
+          {% assign status = stat.status | default: 'ok' %}
+          {% if status == 'ok' %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-ok bg--black">
             <span class="hex-label text--center text--white">{{ stat.name }}</span>
           </div>
+          {% elsif status == 'warning' %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-warning bg--gray-50">
+            <span class="hex-label text--center text--black">{{ stat.name }}</span>
+          </div>
+          {% else %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-critical bg--black">
+            <span class="hex-label text--center text--black bg--white">{{ stat.name }}</span>
+          </div>
+          {% endif %}
           {% if forloop.last %}
             {% assign remaining = row_size | minus: mod | minus: 1 %}
             {% for i in (1..remaining) %}<div class="hexagon placeholder"></div>{% endfor %}

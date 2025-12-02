@@ -34,7 +34,8 @@
           },
           yAxis: {
             title: { text: null },
-            gridLineColor: '#cccccc'
+            gridLineColor: '#000000',
+            gridLineWidth: 0.5
           },
           series: [{
             data: [{% for point in chart_data %}{{ point.value }}{% unless forloop.last %},{% endunless %}{% endfor %}]
@@ -48,14 +49,14 @@
       {% assign filled = pct | times: arc_length | divided_by: 100 %}
       <div class="flex flex--col flex--center flex--middle h--full">
         <svg width="220" height="130" viewBox="0 0 220 130">
-          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#e0e0e0" stroke-width="16" stroke-linecap="round"/>
-          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#1a1a1a" stroke-width="16" stroke-linecap="round"
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+          <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="#000000" stroke-width="16" stroke-linecap="round"
                 stroke-dasharray="{{ filled }} {{ arc_length }}" />
-          <text x="20" y="128" text-anchor="middle" font-size="11" fill="#666">{{ min | default: 0 }}</text>
-          <text x="200" y="128" text-anchor="middle" font-size="11" fill="#666">{{ max | default: 100 }}</text>
-          <text x="110" y="95" text-anchor="middle" font-size="32" font-weight="bold" fill="#1a1a1a">{{ formatted_value | default: value }}</text>
+          <text x="20" y="128" text-anchor="middle" font-size="11" fill="#000000">{{ min | default: 0 }}</text>
+          <text x="200" y="128" text-anchor="middle" font-size="11" fill="#000000">{{ max | default: 100 }}</text>
+          <text x="110" y="95" text-anchor="middle" font-size="32" font-weight="bold" fill="#000000">{{ formatted_value | default: value }}</text>
           {% if title and title != '' %}
-          <text x="110" y="118" text-anchor="middle" font-size="12" fill="#666">{{ title }}</text>
+          <text x="110" y="118" text-anchor="middle" font-size="12" fill="#000000">{{ title }}</text>
           {% endif %}
         </svg>
       </div>
@@ -74,8 +75,8 @@
             </div>
             {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
             {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-            <div class="progress-bar progress-bar--medium w--full">
-              <div class="progress-fill pct--{{ pct_rounded }}"></div>
+            <div class="progress-bar progress-bar--medium w--full bg--gray-15 border--h-1">
+              <div class="progress-fill bg--black pct--{{ pct_rounded }}"></div>
             </div>
           </div>
           {% endfor %}
@@ -113,9 +114,20 @@
         {% for stat in stats %}
           {% assign mod = forloop.index0 | modulo: row_size %}
           {% if mod == 0 %}<div class="hex-row">{% endif %}
-          <div class="hexagon flex flex--col flex--center flex--middle status-{{ stat.status | default: 'ok' }}">
+          {% assign status = stat.status | default: 'ok' %}
+          {% if status == 'ok' %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-ok bg--black">
             <span class="hex-label text--center text--white">{{ stat.name }}</span>
           </div>
+          {% elsif status == 'warning' %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-warning bg--gray-50">
+            <span class="hex-label text--center text--black">{{ stat.name }}</span>
+          </div>
+          {% else %}
+          <div class="hexagon flex flex--col flex--center flex--middle status-critical bg--black">
+            <span class="hex-label text--center text--black bg--white">{{ stat.name }}</span>
+          </div>
+          {% endif %}
           {% if forloop.last %}
             {% assign remaining = row_size | minus: mod | minus: 1 %}
             {% for i in (1..remaining) %}<div class="hexagon placeholder"></div>{% endfor %}

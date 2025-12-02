@@ -1,13 +1,13 @@
 {% comment %} Shared styles - prepended to all layouts {% endcomment %}
 
 <style>
-  /* Custom progress bar without inline styles */
-  .progress-bar { background: #f5f5f5; height: 24px; border-radius: 4px; overflow: hidden; position: relative; border: 2px solid #1a1a1a; }
+  /* Custom progress bar - uses TRMNL bg-- classes for dithering support */
+  .progress-bar { height: 24px; border-radius: 4px; overflow: hidden; position: relative; }
   .progress-bar--small { height: 18px; }
   .progress-bar--large { height: 36px; border-radius: 6px; }
-  .progress-bar--xl { height: 48px; border-radius: 8px; border-width: 3px; }
+  .progress-bar--xl { height: 48px; border-radius: 8px; }
   .progress-bar--medium { height: 28px; border-radius: 5px; }
-  .progress-fill { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); height: 100%; }
+  .progress-fill { height: 100%; }
   .progress-value { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; }
 
   /* Bar gauge layout utilities */
@@ -26,13 +26,11 @@
   .pct--25 { width: 25%; } .pct--30 { width: 30%; } .pct--35 { width: 35%; } .pct--40 { width: 40%; } .pct--45 { width: 45%; }
   .pct--50 { width: 50%; } .pct--55 { width: 55%; } .pct--60 { width: 60%; } .pct--65 { width: 65%; } .pct--70 { width: 70%; }
   .pct--75 { width: 75%; } .pct--80 { width: 80%; } .pct--85 { width: 85%; } .pct--90 { width: 90%; } .pct--95 { width: 95%; } .pct--100 { width: 100%; }
-  /* Base hexagon styles */
+  /* Base hexagon styles - uses TRMNL bg-- classes for dithering support */
   .hexagon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
-  .hexagon.status-ok { background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%); }
-  .hexagon.status-warning { background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%); }
-  .hexagon.status-critical { background: #1a1a1a; position: relative; }
-  .hexagon.status-critical::before { content: ''; position: absolute; top: 3px; right: 3px; bottom: 3px; left: 3px; background: #f5f5f5; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
-  .hexagon.status-critical .hex-label { position: relative; z-index: 1; color: #1a1a1a; }
+  .hexagon.status-critical { position: relative; }
+  .hexagon.status-critical::before { content: ''; position: absolute; top: 3px; right: 3px; bottom: 3px; left: 3px; background: var(--color-white, #fff); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+  .hexagon.status-critical .hex-label { position: relative; z-index: 1; }
   .hexagon.placeholder { visibility: hidden; }
   .hex-label { line-height: 1.2; word-break: break-all; font-weight: bold; }
 
