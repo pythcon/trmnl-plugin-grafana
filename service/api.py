@@ -12,6 +12,7 @@ from flask import Flask, jsonify, request
 
 from service.grafana import GrafanaClient, GrafanaAPIError
 from service.transformers import get_transformer
+from service.test_data import TEST_DATA, PANEL_ALIASES
 
 # Configure logging
 logging.basicConfig(
@@ -179,6 +180,25 @@ def get_data():
 def health():
     """Health check endpoint."""
     return jsonify({"status": "ok"})
+
+
+@app.route("/api/test/<panel_type>", methods=["GET", "POST"])
+def get_test_data(panel_type: str):
+    """
+    Return test/demonstration data for a panel type.
+
+    Supported types: stat, gauge, bargauge, polystat, table, timeseries
+    """
+    panel_type = panel_type.lower()
+    panel_type = PANEL_ALIASES.get(panel_type, panel_type)
+
+    if panel_type not in TEST_DATA:
+        return jsonify({
+            "error": f"Unknown panel type: {panel_type}",
+            "available_types": list(TEST_DATA.keys()),
+        }), 404
+
+    return jsonify(TEST_DATA[panel_type])
 
 
 def create_app():
