@@ -244,6 +244,31 @@ pip install pytest pytest-cov respx
 pytest
 ```
 
+## Test Routes
+
+The API includes test routes that return demonstration data for each panel type. Useful for testing your TRMNL templates without connecting to Grafana.
+
+```bash
+# Get test data for each panel type
+curl http://localhost:8080/api/test/stat
+curl http://localhost:8080/api/test/gauge
+curl http://localhost:8080/api/test/bargauge
+curl http://localhost:8080/api/test/polystat
+curl http://localhost:8080/api/test/table
+curl http://localhost:8080/api/test/timeseries
+```
+
+| Route | Description |
+|-------|-------------|
+| `/api/test/stat` | Single value with color |
+| `/api/test/gauge` | Radial gauge with percentage |
+| `/api/test/bargauge` | Multiple horizontal bars |
+| `/api/test/polystat` | Honeycomb status grid |
+| `/api/test/table` | Tabular data with rows/columns |
+| `/api/test/timeseries` | Time series chart data |
+
+Aliases also work: `graph` and `barchart` → `timeseries`, `grafana-polystat-panel` → `polystat`
+
 ## License
 
 MIT License
