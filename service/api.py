@@ -11,6 +11,7 @@ import os
 from flask import Flask, jsonify, request
 
 from service.grafana import GrafanaClient, GrafanaAPIError
+from service.rate_limiter import rate_limiter
 from service.transformers import get_transformer
 from service.test_data import TEST_DATA, PANEL_ALIASES
 
@@ -99,6 +100,16 @@ def get_data():
     """
     # Get config from request body or env vars
     config, errors = get_config_from_request()
+
+    # Check rate limit (before validation to avoid unnecessary work)
+    grafana_url = config.get("grafana_url", "")
+    if grafana_url and not rate_limiter.is_allowed(grafana_url):
+        retry_after = rate_limiter.get_retry_after(grafana_url)
+        logger.warning(f"Rate limit exceeded for {grafana_url}")
+        return jsonify({
+            "panel_type": "error",
+            "error_message": f"Rate limit exceeded for {grafana_url}",
+        }), 429, {"Retry-After": str(retry_after)}
 
     logger.info(f"Request: dashboard={config.get('dashboard_uid')}, panel={config.get('panel_id')}, time={config.get('time_from')} to {config.get('time_to')}")
 

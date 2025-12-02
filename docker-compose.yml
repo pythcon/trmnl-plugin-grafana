@@ -23,6 +23,7 @@ services:
       - VARIABLES=${VARIABLES:-"{}"}
       - TRMNL_WEBHOOK_URL=${TRMNL_WEBHOOK_URL}
       - INTERVAL=${INTERVAL:-300}
+      - RATE_LIMIT=${RATE_LIMIT:-10}
 
   # ============================================
   # API MODE - TRMNL polls this endpoint
@@ -48,3 +49,5 @@ services:
       - TIME_TO=${TIME_TO:-now}
       - LABEL=${LABEL:-name}
       - VARIABLES=${VARIABLES:-"{}"}
+      - TIMEZONE=${TIMEZONE:-UTC}
+      - RATE_LIMIT=${RATE_LIMIT:-10}

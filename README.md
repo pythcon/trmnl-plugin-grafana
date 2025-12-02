@@ -100,6 +100,7 @@ python -m service.main
 | `TIME_FROM` | No | `now-1h` | Start of time range |
 | `TIME_TO` | No | `now` | End of time range |
 | `TIMEZONE` | No | `UTC` | Timezone for timestamp display |
+| `RATE_LIMIT` | No | - | Max requests per minute per Grafana URL |
 | `TRMNL_WEBHOOK_URL` | Webhook only | - | TRMNL webhook URL |
 | `INTERVAL` | Webhook only | `300` | Seconds between pushes |
 | `API_PORT` | API only | `8080` | Port for API server |
@@ -169,6 +170,16 @@ The `timezone` parameter controls how timestamps are displayed on your TRMNL dev
 - `UTC` (default) - Coordinated Universal Time
 
 **Finding your timezone**: Run `timedatectl list-timezones` on Linux or see the [IANA timezone list](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+### Rate Limiting
+
+Set `RATE_LIMIT` to limit requests per minute per unique Grafana URL. This protects your Grafana instance from excessive API calls.
+
+- If `RATE_LIMIT` is unset or empty, rate limiting is disabled
+- The limit applies per Grafana URL, so multiple Grafana instances are tracked separately
+- Returns HTTP 429 with `Retry-After` header when limit exceeded
+
+**Example**: `RATE_LIMIT=60` allows 60 requests per minute to each Grafana instance.
 
 ## Template Development
 
