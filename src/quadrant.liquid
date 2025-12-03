@@ -70,7 +70,7 @@
             </div>
             {% assign pct_raw = bar.percentage | default: 0 | plus: 2 | divided_by: 5 | times: 5 %}
             {% if pct_raw > 100 %}{% assign pct_rounded = 100 %}{% else %}{% assign pct_rounded = pct_raw %}{% endif %}
-            <div class="progress-bar w--full bg--gray-15 border--h-1">
+            <div class="progress-bar w--full bg--gray-30 border--h-1">
               <div class="progress-fill bg--black pct--{{ pct_rounded }}"></div>
             </div>
           </div>
@@ -110,8 +110,8 @@
             <span class="hex-label text--center text--white">{{ stat.name }}</span>
           </div>
           {% elsif status == 'warning' %}
-          <div class="hexagon flex flex--col flex--center flex--middle status-warning bg--gray-50">
-            <span class="hex-label text--center text--black">{{ stat.name }}</span>
+          <div class="hexagon flex flex--col flex--center flex--middle status-warning bg--gray-30">
+            <span class="hex-label text--center text--white text-stroke text-stroke--black">{{ stat.name }}</span>
           </div>
           {% else %}
           <div class="hexagon flex flex--col flex--center flex--middle status-critical bg--black">

@@ -34,6 +34,9 @@
   .hexagon.placeholder { visibility: hidden; }
   .hex-label { line-height: 1.2; word-break: break-all; font-weight: bold; }
 
+  /* SVG text inherits pixel fonts */
+  svg text { font-family: inherit; }
+
   /* Full layout - dynamic sizing based on stat count */
   .honeycomb { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; width: 100%; height: 100%; }
   .hex-row { display: flex; justify-content: center; width: 100%; }
