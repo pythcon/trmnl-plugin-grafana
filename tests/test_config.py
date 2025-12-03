@@ -22,6 +22,7 @@ class TestConfig:
             trmnl_webhook_url="https://webhook.trmnl.com/xxx",
             interval=300,
             label="name",
+            timezone="UTC",
         )
 
         assert config.grafana_url == "https://grafana.example.com"
