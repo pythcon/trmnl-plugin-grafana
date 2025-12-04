@@ -14,33 +14,34 @@ TRMNL supports two strategies for getting data:
 | Strategy | How it works | Best for |
 |----------|--------------|----------|
 | **Polling** | TRMNL fetches from your API | Public endpoints, serverless |
-| **Webhook** | You push data to TRMNL | Behind firewalls, scheduled updates |
+| **Webhook** | You push data to TRMNL | 🚧 Work in progress |
+
+## Getting Started Options
+
+| Option | Setup | Best For |
+|--------|-------|----------|
+| **Public Instance** | None - ready to use | Quick setup, most users |
+| **Self-Hosted** | Deploy Docker container | Privacy, customization, firewalled Grafana |
+
+The plugin is pre-configured to use our public API at `https://grafana.trmnlplugins.com/api/data`. Just install the plugin and enter your Grafana credentials - no server setup required.
+
+**Note:** To use the public instance, your Grafana must be accessible from the internet. If your Grafana is behind a firewall or on a private network, you'll need to self-host the data service.
 
 ## Quick Start
 
-### 1. Deploy Templates to TRMNL
+### Using the Public Instance (Recommended)
 
-```bash
-# Install trmnlp CLI
-npm install -g trmnlp
+1. Install the **Grafana Panel** plugin from the TRMNL marketplace
+2. Configure with your Grafana details:
+   - Grafana URL
+   - API Key (service account token)
+   - Dashboard UID
+   - Panel ID
+3. Done! The plugin uses the public API automatically.
 
-# Login and push templates
-trmnlp login
-trmnlp push
-```
+### Self-Hosting (Optional)
 
-### 2. Configure Your Plugin in TRMNL
-
-After pushing, go to your TRMNL dashboard and configure the plugin:
-- Choose your **Data Strategy** (Polling or Webhook)
-- For **Polling**: Enter your API URL after setting up the Data Service
-- For **Webhook**: Copy the webhook URL to use with the Data Service
-
-### 3. Run the Data Service
-
-#### Option A: Polling Mode (Recommended)
-
-Host the Data Service as an API that TRMNL polls:
+If you need to self-host (e.g., Grafana behind a firewall):
 
 ```bash
 # Configure environment
@@ -55,24 +56,7 @@ pip install -r requirements.txt
 python -m service.api
 ```
 
-Then configure your TRMNL plugin's Polling URL to point to your API (e.g., `https://your-server.com/api/data`).
-
-#### Option B: Webhook Mode
-
-Run the Data Service to push data to TRMNL on a schedule:
-
-```bash
-# Configure environment
-cp .env.example .env
-# Edit .env with your Grafana credentials AND webhook URL
-
-# Run with Docker
-docker-compose up grafana-trmnl-webhook -d
-
-# Or run directly
-pip install -r requirements.txt
-python -m service.main
-```
+Then update your TRMNL plugin's Polling URL to point to your API (e.g., `https://your-server.com/api/data`).
 
 ## Supported Panel Types
 
