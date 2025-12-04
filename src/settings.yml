@@ -71,7 +71,7 @@ custom_fields:
 - keyname: author_info
   name: About This Plugin
   field_type: author_bio
-  description: Display Grafana panels on your TRMNL e-ink display
+  description: Display Grafana panels on your TRMNL e-ink display. Use our public API or self-host for firewalled Grafana instances.<br/><br/><strong>Supported panels:</strong><br/>• Stat<br/>• Time Series<br/>• Graph (legacy)<br/>• Gauge<br/>• Bar Gauge<br/>• Bar Chart<br/>• Table<br/>• Polystat
   github_url: https://github.com/pythcon/trmnl-plugin-grafana
   learn_more_url: https://trmnlplugins.com
 name: Grafana Panel
