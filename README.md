@@ -56,7 +56,7 @@ pip install -r requirements.txt
 python -m service.api
 ```
 
-Then update your TRMNL plugin's Polling URL to point to your API (e.g., `https://your-server.com/api/data`).
+Then update your TRMNL plugin's Polling URL to point to your API (e.g., `http(s)://your-server.com/api/data`).
 
 ## Supported Panel Types
 
