@@ -167,8 +167,10 @@
         {% assign size_class = 'hex--full-lg' %}{% assign row_size = 6 %}
       {% elsif stat_count <= 35 %}
         {% assign size_class = 'hex--full-md' %}{% assign row_size = 7 %}
+      {% elsif stat_count <= 50 %}
+        {% assign size_class = 'hex--full-sm' %}{% assign row_size = 10 %}
       {% else %}
-        {% assign size_class = 'hex--full-sm' %}{% assign row_size = 11 %}
+        {% assign size_class = 'hex--full-xs' %}{% assign row_size = 12 %}
       {% endif %}
       <div class="honeycomb {{ size_class }}">
         {% for stat in stats %}
