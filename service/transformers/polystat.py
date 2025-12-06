@@ -59,6 +59,29 @@ class PolystatTransformer(BaseTransformer):
         variables["stats"] = stats
         return variables
 
+    def _get_status_from_polystat_thresholds(self, value: float, thresholds: list) -> str:
+        """Map value to status using polystat globalThresholdsConfig structure.
+
+        Polystat state mapping: 0=ok, 1=warning, 2=critical
+        """
+        # Sort thresholds by value descending to find highest matching
+        sorted_thresholds = sorted(
+            [t for t in thresholds if t.get("value") is not None],
+            key=lambda t: t.get("value", 0),
+            reverse=True
+        )
+
+        for threshold in sorted_thresholds:
+            if value >= threshold.get("value", 0):
+                state = threshold.get("state", 0)
+                if state == 2:
+                    return "critical"
+                elif state == 1:
+                    return "warning"
+                return "ok"
+
+        return "ok"
+
     def _get_status(self, value: Any, panel: Panel) -> str:
         """
         Determine status based on value and thresholds.
@@ -77,6 +100,12 @@ class PolystatTransformer(BaseTransformer):
                 return "warning"
             return "ok"
 
+        # Check polystat global thresholds first
+        global_thresholds = panel.options.get("globalThresholdsConfig", [])
+        if global_thresholds:
+            return self._get_status_from_polystat_thresholds(value, global_thresholds)
+
+        # Fall back to standard thresholds
         thresholds = panel.get_thresholds()
         if not thresholds:
             # Fallback for service health metrics: 0 = down/critical
